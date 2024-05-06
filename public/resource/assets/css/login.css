@@ -1,0 +1,22 @@
+body{background-color:#272727;    background: url(http://admin.wanyutv.com/images/background-blur-clean.jpg) no-repeat center;}
+.fl{float:left}
+.fr{float:right}
+.clear{clear:both}
+a{text-decoration:none;color:#333;transition:ease all .5s}
+a{color:#fff}
+.login_header{margin-bottom:40px;font-size: 16px;}
+.login_header span{margin-right:20px;cursor:pointer}
+.loginbox{width:300px;overflow:hidden;padding:20px;padding-top:15px}
+.Cbody_item{border:0 solid #999;overflow:hidden}
+.form_item{font-size:13px}
+.form_item input[type=text],.form_item input[type=password]{display:block;width:calc(100% - 20px);height:36px;margin:0 auto;padding-left:16px;outline:none;border:1px solid #eee;transition:ease all .5s;margin-bottom:20px;border-radius: 5px;}
+.form_item input[type=text]:focus,.form_item input[type=password]:focus{border:1px solid #1c65ff}
+.form_item input[type=submit]{display:block;width:calc(100% - 0px);height:40px;margin:0 auto;padding-left:16px;outline:none;border:1px solid #1c65ff;transition:ease all .5s;margin-top:20px;margin-bottom:20px;background-color:#1c65ff;color:#fff;cursor:pointer}
+.form_item input[type=submit]:hover{background-color:#3f7dff;border:1px solid #3f7dff}
+.active{color:#fff;padding-bottom:10px;border-bottom:3px solid #fff}
+.loginrslider{width:160px;height:322px;background-color:#1c65ff}
+.login_warp{right:10%;width:500px;/**/margin:15% auto;border-radius:5px;box-shadow:0 0 0 #ccc;overflow:hidden;/*border:1px solid #484eeb;margin-top:10%;*/transition:ease all .5s;position:fixed;top:0;cursor:pointer;background-color:rgba(0,0,0,0.5)}
+/*.login_warp:hover{box-shadow:0 15px 21px rgba(10,10,10,.5);-webkit-box-shadow:0 15px 21px rgba(10,10,10,.5)}*/
+.loginrslider{color:#fff}.qcode{width:160px;height:160px;background-color:#ccc;margin:0 auto;margin-top:2px}
+.beizhu{text-align:center;font-size:13px;margin-top:10px;color:#eee;}
+.login-logo{  font-size: 25px;  text-align: center;  padding: 10px;  border-bottom: 1px solid #fff;  }

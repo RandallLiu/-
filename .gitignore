@@ -3,9 +3,33 @@ bin-debug/
 bin-release/
 [Oo]bj/
 [Bb]in/
-
+/.DS_Store
 # Other files and folders
 .settings/
+/writable/logs
+/writable/session
+/writable/cache
+/app/Controllers/Gaokao.php
+/app/Controllers/Spider.php
+/writable/uploads/data/school
+/writable/uploads/data/province
+/writable/uploads/data/province_score
+/writable/uploads/data/special_detail
+/writable/uploads/data/read.md
+/writable/uploads/icons
+
+/writable/uploads/data/dict.json
+/writable/uploads/data/dict.batch.json
+/writable/uploads/data/dict.score.section.json
+/writable/uploads/data/dict.score.section.json
+/writable/uploads/data/kemu.dict.json
+/writable/uploads/data/kemu.json
+/writable/uploads/data/province.year.kemu.json
+/writable/uploads/data/province_score.json
+/writable/uploads/data/school.name.json
+/writable/uploads/data/special.json
+/writable/uploads/data/temp.json
+/writable/uploads/data/zk_special.json
 
 # Executables
 *.swf
@@ -13,6 +37,11 @@ bin-release/
 *.ipa
 *.apk
 
+/load_font.php
+/odds_sections.php
+/odds_score.php
+/odds_line_deviation.php
+/writer_data.php
 # Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
 # should NOT be excluded as they contain compiler settings and other important
 # information for Eclipse / Flash Builder.

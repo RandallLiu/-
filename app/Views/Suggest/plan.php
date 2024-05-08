@@ -20,13 +20,13 @@
             <td class="text-center">
                 <h6><?=$item['odds']?:'1'?> <span class="text-muted" style="font-size: 12px"> %</span> </h6>
                 <?php
-                    $cls = $item['odds'] <= 35 ? 'danger' : (($item['odds'] > 35 && $item['odds'] < 75) ? 'blue':'success');
+                    $cls = $item['odds'] <= 45 ? 'danger' : (($item['odds'] > 45 && $item['odds'] < 75) ? 'blue':'success');
                     $text = "风险大";
 
-                if ($item['odds'] <= 35 && $item['odds'] > 10) {
+                if ($item['odds'] <= 45 && $item['odds'] > 10) {
                     $text = '冲';
                 }
-                if ($item['odds'] > 35 && $item['odds'] <= 75) {
+                if ($item['odds'] > 45 && $item['odds'] <= 75) {
                     $text = '稳';
                 }
                 if ($item['odds'] > 75) {
@@ -52,7 +52,7 @@
 
             <td class="text-center" style="padding: 0px;">
                 <p style="border-bottom: 1px solid #e2e2e2;">最低分数</p>
-                <p style="border-bottom: 1px solid #e2e2e2;">最低位次</p>
+                <p style="border-bottom: 1px solid #e2e2e2;">最低/我的位次</p>
                 <p style="border-bottom: 0px">招生人数</p>
             </td>
 
@@ -73,8 +73,15 @@
                 <?php endforeach;?>
 
                 <td width="10%" class="text-center" style="padding: 0px;">
+                    <?php  $is_up = ((is_numeric($section) && $section>$kemu['section'])?'danger':'success');?>
                     <p style="border-bottom: 1px solid #e2e2e2;"><?=$min?></p>
-                    <p style="border-bottom: 1px solid #e2e2e2;"><?=$section?></p>
+                    <p style="border-bottom: 1px solid #e2e2e2;">
+                        <?php if( is_numeric($section) ):?>
+                        <?=$section?> / <span class="text-<?=$is_up?>-300"><?=$kemu['section']?:0?><i class="icon <?=($is_up=='success'? 'icon-arrow-small-down' : 'icon-arrow-small-up')?>"></i></span>
+                        <?php else:?>
+                        -
+                        <?php endif;?>
+                    </p>
                     <p style="border-bottom: 0px"><?=$nums?></p>
                 </td>
 

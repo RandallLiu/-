@@ -44,7 +44,6 @@ class odds {
         // 高分区
         if ( ($this->schAvalue - $this->Avalue) >= 0 ) {
             $u = round((($this->schAvalue - $this->Avalue) / $this->Avalue) * 100);
-            // log_message('error','schAvalue:'.$this->schAvalue.',Avalue:'.$this->Avalue);
             $odds =  ($u >= $this->up_percent) ? -($this->up_percent - 1) : -$u;
             $this->odds_type = $this->odds_type ?:(($odds + $this->base_rate) < $this->feed_value ? 'N':'C');
             $bs = $this->base_rate;
@@ -60,9 +59,9 @@ class odds {
 
         // 不同区域类型不同权重比例
         $rate = ($this->odds_type == 'W' ? $this->odds_wt_rate : ($this->odds_type == 'B'?$this->odds_bd_rate:$this->odds_cj_rate));
-        // log_message('error',$odds);
+        //
         $odds = $bs * $rate  + round($odds);
-        // log_message('error',$rate . '-'.$bs. '-'.$odds );
+        //
         $AB = (intval($odds / $this->cs) * $this->cs);
 
         return (($odds > $this->cs) && $odds > 20) ? ($AB > 99 ? 99: $AB) : $odds;

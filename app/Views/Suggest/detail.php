@@ -13,9 +13,9 @@
         <th width="25%">招生院校专业</th>
         <th width="10%" class="text-center">录取概率</th>
         <th width="10%" class="text-center"><?=$current_year?>招生计划</th>
-        <th width="15%" class="text-center">历年</th>
+        <th width="12%" class="text-center">历年</th>
         <?php foreach ($data['years'] as $year):?>
-            <th width="10%" class="text-center"><?=$year?></th>
+            <th width="11%" class="text-center"><?=$year?></th>
         <?php endforeach;?>
         <th width="10%" class="text-center">
             操作

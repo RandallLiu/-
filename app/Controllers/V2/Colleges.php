@@ -340,10 +340,10 @@ class Colleges extends BC {
         $special_sql = '';
         // 获取概率
         $position = odds_data(['level' => $level],$year);
+        // log_message('error',json_encode($position));
         $odds_service->Avalue = $position['Avalue'];
         $shool_key_position = $position['shool_key_position'];
         $batch = $position['batch']; $score = $position['score'];
-
 
         // 院校优先
         if ( $chose == 'schools' ) {
@@ -352,7 +352,13 @@ class Colleges extends BC {
         }
 
         // 获取分值范围
-        if ($type) { $down_score = $score + ($this->cwb_range[$type]['min']/100 * $odds_service->Avalue); $up_score = $score + (($this->cwb_range[$type]['max']/100) * $odds_service->Avalue);}
+        if ($type) {
+            $down_score = $score + ($this->cwb_range[$type]['min']/100 * $odds_service->Avalue);
+            $up_score = $score + (($this->cwb_range[$type]['max']/100) * $odds_service->Avalue);
+            // log_message('error',"min:".$this->cwb_range[$type]['min']);
+            // log_message('error',"max:".$this->cwb_range[$type]['max']);
+            // log_message('error',"Avalue:".$odds_service->Avalue . ',change:'.($odds_service->Avalue==0?1:$odds_service->Avalue));
+        }
 
         // 专业优先
         if ( $chose == 'special' && ($P['level2_id'] || $P['level3_code'])) {
@@ -362,8 +368,12 @@ class Colleges extends BC {
             $this->db->where("$special_sql");
         }
 
+
+        $batchs = batchs(['level' => $level]);
+
+        // 'a.batch' => $batch,
         // 查询条件
-        $search_data = ['a.batch' => $batch,"a.type"=>$kemu['typeId'],'a.province'=>$kemu['province'],'a.year'=>($year+1)];
+        $search_data = ["a.type"=>$kemu['typeId'],'a.province'=>$kemu['province'],'a.year'=>($year+1)];
 
         // 冲击 数量
         $chongji = $this->_tab_nums($province,$search_data,$P,$st,$chose,$special_sql,'C',$score,$shool_ids , $odds_service->Avalue);
@@ -374,6 +384,7 @@ class Colleges extends BC {
 
         // 存在记录
         if ( $shool_ids ) $this->db->whereIn('a.school_id',$shool_ids);
+
         // 取值范围
         if ( $type ) $this->db->where("(Avalue > ($down_score-proscore) and Avalue < ($up_score-proscore))");
 
@@ -383,6 +394,7 @@ class Colleges extends BC {
             ->from("tzy_odds_score as a",true )
             ->join("tzy_schools as b","a.school_id = b.school_id" )
             ->where($search_data)
+            ->where("(a.batch = $batch or a.batch in($batchs))")
             ->orderBy('a.Avalue','desc')
             ->pagination( $this->page() , $this->size());
 
@@ -393,14 +405,16 @@ class Colleges extends BC {
         foreach ( $data['data'] as $row ) {
             // 历年
             $score_data = $this->db->select("year,min,proscore,min_section as section")->from("tzy_schools_province_score",true)
-                ->where(['school_id'=>$row->school_id,"province_id"=>$row->province_id,'type'=>$kemu['typeId'],'batch'=>$batch,])
+                ->where(['school_id'=>$row->school_id,"province_id"=>$row->province_id,'type'=>$kemu['typeId']])
+                ->where("(batch = $batch or batch in ($batchs))")
                 ->whereIn("year",[$year-1,$year-2])
                 ->orderBy("year",'desc')->findAll();
 
             // 历年招生计划
             $plan_data = $this->db->select("year,sum(num) as num")->from("tzy_schools_province_specials_plan",true)
-                ->where(['school_id'=>$row->school_id,"province"=>$row->province_id,'type'=>$kemu['typeId'],'batch'=>$batch,//$kemu['batch']
+                ->where(['school_id'=>$row->school_id,"province"=>$row->province_id,'type'=>$kemu['typeId']//$kemu['batch']
                 ])
+                ->where("(batch = $batch or batch in ($batchs))")
                 ->whereIn("year",[$year-1,$year-2])
                 ->orderBy("year",'desc')
                 ->groupBy("year")
@@ -410,7 +424,8 @@ class Colleges extends BC {
             $last_plan_data = $this->db->select("year,sum(num) as num")->from("tzy_schools_province_specials_plan",true)
                 ->where(['school_id'=>$row->school_id,"province"=>$row->province_id,'type'=>$kemu['typeId']])
                 ->where("year",$year)
-                ->where('batch',$batch)
+                // ->where('batch',$batch)
+                ->where("(batch = $batch or batch in ($batchs))")
                 ->orderBy("year",'desc')
                 ->groupBy("year")
                 ->findAll();
@@ -444,9 +459,14 @@ class Colleges extends BC {
         $P = $this->U(); $year = $this->year(); $kemu = session('kemu'); $years = [$year,$year-1,$year-2];
         // 学校数据
         if ($school_data = $this->db->asObject()->where("id",$P['id'])->first()) {
-            $argc = ['school_id' => $school_data->school_id , 'type' => $kemu['typeId'],'batch' => $P['level'] == '2001' ? 14 : 10];
-
+            //
+            $batchs = batchs($P);
+            $batch = $P['level'] == '2001' ? 14 : 10;
+            // ,'batch' => $P['level'] == '2001' ? 14 : 10
+            $argc = ['school_id' => $school_data->school_id , 'type' => $kemu['typeId']];
+            //
             $position = odds_data($P,$year);
+
             $odds_service->odds_type = $P['score_type'];
             // 平均分差
             $odds_service->Avalue = $position['Avalue'];
@@ -458,12 +478,14 @@ class Colleges extends BC {
             // 学校所有省份分数线
             $school_data->total_score_data = $this->db->from("tzy_schools_province_score",true)
                 ->whereIn('year',$years)->where($argc)
+                ->where("(batch = $batch or batch in ($batchs))")
                 ->where('province_id',$kemu['province'])->findAll();
 
             // 学校所有招生计划数据
             $school_data->total_plan_data = $this->db->select("year,sum(num) as nums")
                 ->from("tzy_schools_province_specials_plan",true)->whereIn('year',$years)
                 ->where('province',$kemu['province'])->where($argc)
+                ->where("(batch = $batch or batch in ($batchs))")
                 ->orderBy("year",'desc')
                 ->groupBy("year")
                 ->findAll();
@@ -482,6 +504,8 @@ class Colleges extends BC {
     public function plan_item(){
         $plan_db = (new \App\Models\Resource\SchSpePlan());  $odds_service = new odds();
         $P = $this->U(); $year = $this->year(); $kemu = session('kemu');
+        //
+        $batchs = batchs($P);
 
         $years = [$year,$year-1,$year-2]; $plan_data = []; $score_data = [];
         // 学校数据
@@ -490,21 +514,23 @@ class Colleges extends BC {
             $odds_data = (new \App\Models\Resource\Odds())->where('id',$P['odds_id'])->first();
             //
             $position = odds_data($P , $year);
-            // $odds_service->odds_type = $P['stype'];
-            $odds_service->Avalue = $position['Avalue'];
-
-            // var_dump($odds_service->odds_type,$odds_service->Avalue);
             //
-            $argc = ['school_id' => $school_data->school_id , 'type' => $kemu['typeId'],'batch' => $P['level'] == '2001' ? 14 : 10];
+            $odds_service->Avalue = $position['Avalue'];
+            // ,'batch' => $P['level'] == '2001' ? 14 : 10
+            $batch =  $P['level'] == '2001' ? 14 : 10;
+            $argc = ['school_id' => $school_data->school_id , 'type' => $kemu['typeId']];
             // 历年分数线
-            $score_data = $this->db->from("tzy_schools_province_specials",true)->where($argc)->where('province',$kemu['province'])->whereIn('year',$years)->findAll();
+            $score_data = $this->db->from("tzy_schools_province_specials",true)
+                ->where("(batch = $batch or batch in ($batchs))")
+                ->where($argc)->where('province',$kemu['province'])->whereIn('year',$years)->orderBy('year','desc')->findAll();
 
             // 历年招生计划
             $plan_data = $plan_db->asObject()
                 ->select("a.* , b.name as spname2")
                 ->from("tzy_schools_province_specials_plan as a",true)
                 ->join("tzy_specials as b", "a.special_id = b.special_id","left")
-                ->where($argc)->where('a.province',$kemu['province'])->whereIn('a.year',$years)->findAll();
+                ->where("(batch = $batch or batch in ($batchs))")
+                ->where($argc)->where('a.province',$kemu['province'])->whereIn('a.year',$years)->orderBy('year','desc')->findAll();
 
             $asp_db = (new \App\Models\Resource\Aspiration());
 
@@ -514,7 +540,7 @@ class Colleges extends BC {
                 $plan->has_plan = $has_asp ? true : false;
                 $odds = 0; $odds_type = '';
                 foreach ($score_data as $score) {
-                    if ($plan->special_id == $score['special_id'] && ($plan->year == $score['year'] && $year == $score['year'] && $year == $plan->year)) {
+                    if ($plan->special_id == $score['special_id'] && $odds == 0) { //($plan->year == $score['year'] && $year == $score['year'] && $year == $plan->year)
                         $s = (((is_numeric($score['average']) && $score['average'])?$score['average']: $score['min']) - $odds_data['proscore']);
                         $odds_service->schAvalue = $s;
                         $odds = $odds_service->compares_avalue();
@@ -581,5 +607,7 @@ class Colleges extends BC {
             ruanke_rank as rank,
             school_batch batch
             ";
+
+
 }
 

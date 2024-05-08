@@ -14,7 +14,7 @@ class Kemu extends BC
     function selected(){
         if ( $this->request->getMethod() == 'post' ) {
             $P = $this->U();
-            if ( $P['typeId'] == '3' && count($P['kemu']) != 3 ) return $this->setError("至少选3个学科!");
+            if (!$P['kemu'] ||( $P['typeId'] == '3' && count($P['kemu']) != 3 )) return $this->setError("至少选3个学科!");
             if ( in_array($P['typeId'],['2073','2074']) && count($P['kemu']) != 2 ) return $this->setError("至少选2个学科!");
 
             if ( !$P['batch'] ) {
@@ -23,7 +23,7 @@ class Kemu extends BC
             }
 
             // 如果登录 则保存信息
-            if ( session("name") && session('id')) {
+            if ( session("name") && session('id') ) {
                 (new \App\Models\Users())->save(['id' => session('id'),'province'=>$P['province'],'score'=>$P['score'],'kemu'=> json_encode($P) ]);
             }
 
@@ -44,7 +44,6 @@ class Kemu extends BC
     public function get_kemu_item(){
         $p = $this->U('province');
         $data['kemu'] = kemu()[$p];
-        //var_dump($data['kemu']);return ;
         $data['province'] = $p;
         return $this->render(['view_path' => '/Comm/kemu','data' => $data]);
     }
@@ -56,4 +55,6 @@ class Kemu extends BC
         log_message('error',$db->getLastQuery());
         return $this->toJson(['data'=>$data]);
     }
+
+
 }

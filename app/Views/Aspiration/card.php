@@ -14,12 +14,12 @@
         <td class="text-center">
             <h4><?=$card['odds']??0?> <span class="text-muted" style="font-size: 12px"> %</span></h4>
             <?php
-            $cls = $card['odds'] <= 35 ? 'danger' : (($card['odds'] > 35 && $card['odds'] < 75) ? 'blue':'success');
+            $cls = $card['odds'] <= 45 ? 'danger' : (($card['odds'] > 45 && $card['odds'] < 75) ? 'blue':'success');
 
-            if ($card['odds'] <= 35 && $card['odds'] >= 0) {
+            if ($card['odds'] <= 45 && $card['odds'] >= 0) {
                 $text = '冲';
             }
-            if ($card['odds'] > 35 && $card['odds'] <= 75) {
+            if ($card['odds'] > 45 && $card['odds'] <= 75) {
                 $text = '稳';
             }
             if ($card['odds'] > 75) {

@@ -493,24 +493,33 @@ function odds_data($P , $year){
     $shool_key_position = [] ; $Avalue = 0;
     // 本科批选择 专业批次
     if ( $P['level'] == '2002' && $batch != '10') {
+        // $batch_zk = join(',',\App\Libraries\LibComm::$batch_zk);
         /*  临界情况 */
         $section_db = (new \App\Models\Resource\Sections());
         // 位次条件
         $section_where = ['year' => $year, 'province_id' => $kemu['province'], 'type' => $kemu['typeId']];
         // 获取专科最大分数值
-        $score_batch_section = $section_db->selectMax("score")->where("batch",10)->where($section_where)->first();
+        $score_batch_section = $section_db->selectMax("score")->whereIn("batch",\App\Libraries\LibComm::$batch_zk)->where($section_where)->first();
         // 获取分值所对应位置
         $temp_section = $section_db->where($section_where)->where('score', ($score_batch_section['score']))->first();
         //
         $batch = $temp_section['batch']; $score = $score_batch_section['score'];
     }
-    // 条件
-    $odds_argc = ['province'=>$kemu['province'],'batch' => ($batch) , 'type' => $kemu['typeId'],'year' => $year + 1];
-    // 获取
-    $odds_avalue = $db->where($odds_argc)->where("Avalue >= ($score - proscore)")->orderBy("Avalue","asc")->first();
-    // 查询录取概率信息
-    $load_odds_data = $db->where($odds_argc)->where("Avalue >= (($score - proscore) * 0.1)")->orderBy("Avalue","desc")->findAll();
+    //
+    $batchs = batchs($P);
 
+    // ,'batch' => ($batch)
+    // 条件
+    $odds_argc = ['province'=>$kemu['province'], 'type' => $kemu['typeId'],'year' => $year + 1];
+    // 获取
+    $odds_avalue = $db->where($odds_argc)->where("(batch = '{$batch}' or batch in ($batchs))")
+        ->where("Avalue >= ($score - proscore)")->orderBy("Avalue","asc")->first();
+     log_message('error',$db->getLastQuery());
+    // 查询录取概率信息
+    $load_odds_data = $db->where($odds_argc)
+        ->where("(batch = '{$batch}' or batch in ($batchs))")
+        ->where("Avalue >= (($score - proscore) * 0.1)")->orderBy("Avalue","desc")->findAll();
+    // log_message('error',$db->getLastQuery());
     // 所有概率
     if ( $load_odds_data ) foreach ($load_odds_data as $k => $odds) {
         $shool_ids[] = $odds['school_id']; $shool_key_position["{$odds["school_id"]}"] = ["idx" => $k + 1 , 'value' => $odds['Avalue']];
@@ -518,6 +527,10 @@ function odds_data($P , $year){
             $Avalue = $odds['Avalue'];
         }
     }
+    // return ['batch' => $batch,'score' => $score,'Avalue' => ($Avalue <= 8 ? ($Avalue*100) : $Avalue ) , 'shool_key_position'=>$shool_key_position];
+    return ['batch' => $batch,'score' => $score,'Avalue' => ( $Avalue ) , 'shool_key_position'=>$shool_key_position];
+}
 
-    return ['batch' => $batch,'score' => $score,'Avalue' => $Avalue, 'shool_key_position'=>$shool_key_position];
+function batchs($P){
+    return join(',',$P['level'] == '2001' ? \App\Libraries\LibComm::$batch_bk:\App\Libraries\LibComm::$batch_zk);
 }

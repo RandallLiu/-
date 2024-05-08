@@ -11,7 +11,7 @@
             <input
                     type="<?=(($kemu['type']=='2'|| $kemu['type']=='1')?'checkbox':'radio')?>"
                     name="<?=(($kemu['type']=='3'|| $kemu['type']=='0')?'typeId':'kemu[]')?>" class="kemu"
-                    value="<?=(($kemu['type']=='3')?($item['subjectID']==2?'2073':'2074'):($item['subjectID']==0?1:2))?>"
+                    value="<?=(($kemu['type']=='3')?($item['subjectID']==2?'2073':'2074'):($item['subjectID'] == 0 ? '1' : ($item['subjectID'] == 1 ? '2' :$item['subjectID'])))?>"
             >
             <?=$item['subjectName']?>
         </label>

@@ -323,13 +323,10 @@ class Colleges extends BC {
 
     // 测试
     public function suggest_test(){
-        $db = new \App\Models\Resource\Odds();
-        //
         $odds_service = new odds();
-
         $P = $this->U();
         // 学校ID集合
-        $shool_ids = []; $shool_key_position = [];
+        $shool_ids = []; $shool_key_position = []; $is_login = session('id')?true:false;
         // 用户科目 用户信息
         $kemu = session('kemu'); $uid = session('id');
         // 当年高考信息
@@ -399,10 +396,8 @@ class Colleges extends BC {
             ->pagination( $this->page() , $this->size());
 
         log_message('error',$this->db->getLastQuery());
-        // 查出所有可能情况
-        // $all_nums = count($shool_ids);
 
-        foreach ( $data['data'] as $row ) {
+        foreach ( $data['data'] as $key=>$row ) {
             // 历年
             $score_data = $this->db->select("year,min,proscore,min_section as section")->from("tzy_schools_province_score",true)
                 ->where(['school_id'=>$row->school_id,"province_id"=>$row->province_id,'type'=>$kemu['typeId']])
@@ -443,6 +438,7 @@ class Colleges extends BC {
             $row->year = $year;
             $row->t = $odds_service->odds_type;
             $row->tn = $row->odds < 10 ? "风险很大" : $this->cwb[$odds_service->odds_type];
+
             unset($row->school_id);
         }
 

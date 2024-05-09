@@ -10,6 +10,7 @@ CI4.0
 
 1.  apache 环境安装
 2.  composer 安装
+3.  根目录.env.example 重全名 .env
 
 #### 使用说明
 

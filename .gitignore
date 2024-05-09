@@ -21,7 +21,6 @@ bin-release/
 /writable/uploads/data/dict.json
 /writable/uploads/data/dict.batch.json
 /writable/uploads/data/dict.score.section.json
-/writable/uploads/data/dict.score.section.json
 /writable/uploads/data/kemu.dict.json
 /writable/uploads/data/kemu.json
 /writable/uploads/data/province.year.kemu.json
@@ -30,7 +29,7 @@ bin-release/
 /writable/uploads/data/special.json
 /writable/uploads/data/temp.json
 /writable/uploads/data/zk_special.json
-
+.env
 # Executables
 *.swf
 *.air
